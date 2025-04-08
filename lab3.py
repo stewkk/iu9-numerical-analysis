@@ -6,11 +6,11 @@ import math
 
 EPS = 0.001
 
-# def f(x):
-#     return math.sin(x) * math.cos(x/2)
-
 def f(x):
-    return math.exp(x)
+    return math.sin(x) * math.cos(x/2)
+
+# def f(x):
+#     return math.exp(x)
 
 def rectangles(h, n, a, b):
     # n = int((b-a)/h)
@@ -59,8 +59,8 @@ def calc(a, b, method, p):
 
 def main():
     a = 0
-    # b = math.pi
-    b = 1
+    b = math.pi
+    # b = 1
 
     iters_rectangles, h_rect, n_rect, ds_rect, res = calc(a, b, rectangles, 2)
     print(res)

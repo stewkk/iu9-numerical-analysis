@@ -1,0 +1,89 @@
+#+title: Readme
+
+Решение СЛАУ с 3-диагональной матрицей методом прогонки.
+
+Конфигурация матрицы:
+
+#+begin_example
+l = s2+1
+s = 1 => l=3 (трехдиагональная)
+s = 2 => l=5
+#+end_example
+
+Постановка задачи:
+
+#+begin_example
+Ax = d, A \in R^{n*n}, x, d \in R^n
+Дано A, d
+Найти x
+#+end_example
+
+#+begin_example
+матрица:
+
+b1 c1                   x1       d1
+a1 b2 c2                x2       d2
+   a2 b3 c3         *   x3   *
+       ....             ...      ...
+            an-1 bn     xn       dn
+#+end_example
+
+#+begin_example
+b1x1 + c1x2 = d1
+a1x1 + b2x2 + c2x3 = d2
+
+an-1xn-1 + bnxn = dn
+#+end_example
+
+из этой системы получаем:
+
+#+begin_example
+x1 = -c1x2 / b1 + d1/b1, пусть alpha1 = -c1/b1, beta1 = d1/b1
+=> x1 = alpha1 x2 + beta1
+#+end_example
+
+#+begin_example
+a1 (alpha1 x2 + beta1) + b2x2 + c2x3 = d2
+(a1 alpha1 + b2)x2 + c2x3 = d2 = a1 beta1
+x2 = - c2x3 / (a1 alpha1 + b2) + (d2 - a1 beta1) / (a1 alpha1) + b2, пусть alpha2 = -c2 / (a1 alpha1 + b2), beta2 = (d2 - a1 beta1) / (a1 alpha1 + b2)
+=> x2 = alpha2 x3 + beta2
+#+end_example
+
+#+begin_example
+xi = - ci * xi-1 / (ai-1 alphai-1 + bi) + (di - ai-1 + betai-1) / (ai-1 + alphai-1 + bi)
+
+xn-1 = cn-1 xn / (an-2 alpha n-2 + bn-1) + (dn-1 - an-2 alphan-2) / (an-2 dn-2 bn-1)
+
+прямой ход:
+alphai = -ci/(ai-1 alphai-1 + bi), alpha1 = -c1/b1
+betai = (di - ai-1 betai-1) / (ai-1 alphai-1 + bi), beta1=d1/b1
+
+обратный ход:
+xi = alphai = xi+1 + betai
+i = n, n-1, ..., 1
+
+xn-1 = -bn / an-1 xn + dn / an-1
+xn = betan
+#+end_example
+
+#+begin_example
+b1 != 0
+|ai-1 / bi| <= 1
+|ci / bi| <= 1  достаточные условия
+#+end_example
+
+#+begin_example
+Ax = d
+Ax' = d'
+-
+A(x-x') = d - d'
+   e = x - x' - вектор ошибки
+   r = d - d' - вектор невязки
+
+Ae = r => e = A^{-1}r // только теоретический метод, т.к. есть своя вычислительная погрешность (получается завышенная оценка)
+Определение вектора ошибки по вектору невязки
+
+Тем не менее, при реальных расчтах, такая оценка погрешности оказывается значимо загрубленной. Добавляется вычислительная погрешность вычисления обратной матрицы. Реальная погрешность точно не превышает найденное знаечние. Подобный подход не применяется на практике, тем не менее навык оценивания оказывается стандартным для других методов.
+
+Методичка Копченого
+#+end_example
