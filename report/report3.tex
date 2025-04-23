@@ -1,0 +1,805 @@
+% !TeX TXS-program:bibliography = txs:///biber
+\documentclass[14pt, russian]{scrartcl}
+\let\counterwithout\relax
+\let\counterwithin\relax
+%\usepackage{lmodern}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{extsizes}
+\usepackage{subfig}
+\usepackage[export]{adjustbox}
+\usepackage{tocvsec2} % возможность менять учитываемую глубину разделов в оглавлении
+\usepackage[subfigure]{tocloft}
+\usepackage[newfloat,outputdir=build]{minted}
+\captionsetup[listing]{position=top}
+
+\AtBeginEnvironment{figure}{\vspace{0.5cm}}
+\AtBeginEnvironment{table}{\vspace{0.5cm}}
+\AtBeginEnvironment{listing}{\vspace{0.5cm}}
+\AtBeginEnvironment{algorithm}{\vspace{0.5cm}}
+\AtBeginEnvironment{minted}{\vspace{-0.5cm}}
+
+\usepackage{fancyvrb}
+\usepackage{ulem,bm,mathrsfs,ifsym} %зачеркивания, особо жирный стиль и RSFS начертание
+\usepackage{sectsty} % переопределение стилей подразделов
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Поля и разметка страницы %%%
+\usepackage{pdflscape}                              % Для включения альбомных страниц
+\usepackage{geometry}                               % Для последующего задания полей
+\geometry{a4paper,tmargin=2cm,bmargin=2cm,lmargin=3cm,rmargin=1cm} % тоже самое, но лучше
+
+%%% Математические пакеты %%%
+\usepackage{amsthm,amsfonts,amsmath,amssymb,amscd}  % Математические дополнения от AMS
+\usepackage{mathtools}                              % Добавляет окружение multlined
+\usepackage[perpage]{footmisc}
+%\usepackage{times}
+
+%%%% Установки для размера шрифта 14 pt %%%%
+%% Формирование переменных и констант для сравнения (один раз для всех подключаемых файлов)%%
+%% должно располагаться до вызова пакета fontspec или polyglossia, потому что они сбивают его работу
+%\newlength{\curtextsize}
+%\newlength{\bigtextsize}
+%\setlength{\bigtextsize}{13pt}
+\KOMAoptions{fontsize=14pt}
+
+\makeatletter
+\def\showfontsize{\f@size{} point}
+\makeatother
+
+%\makeatletter
+%\show\f@size                                       % неплохо для отслеживания, но вызывает стопорение процесса, если документ компилируется без команды  -interaction=nonstopmode
+%\setlength{\curtextsize}{\f@size pt}
+%\makeatother
+
+%шрифт times
+\usepackage{tempora}
+%\usepackage{pscyr}
+%\setmainfont[Ligatures={TeX,Historic}]{Times New Roman}
+
+   %%% Решение проблемы копирования текста в буфер кракозябрами
+%    \input glyphtounicode.tex
+%    \input glyphtounicode-cmr.tex %from pdfx package
+%    \pdfgentounicode=1
+    \usepackage{cmap}                               % Улучшенный поиск русских слов в полученном pdf-файле
+    \usepackage[T1]{fontenc}                       % Поддержка русских букв
+    \usepackage[utf8]{inputenc}                     % Кодировка utf8
+    \usepackage[english, main=russian]{babel}            % Языки: русский, английский
+%   \IfFileExists{pscyr.sty}{\usepackage{pscyr}}{}  % Красивые русские шрифты
+%\renewcommand{\rmdefault}{ftm}
+%%% Оформление абзацев %%%
+\usepackage{indentfirst}                            % Красная строка
+%\usepackage{eskdpz}
+
+%%% Таблицы %%%
+\usepackage{longtable}                              % Длинные таблицы
+\usepackage{multirow,makecell,array}                % Улучшенное форматирование таблиц
+\usepackage{booktabs}                               % Возможность оформления таблиц в классическом книжном стиле (при правильном использовании не противоречит ГОСТ)
+
+%%% Общее форматирование
+\usepackage{soulutf8}                               % Поддержка переносоустойчивых подчёркиваний и зачёркиваний
+\usepackage{icomma}                                 % Запятая в десятичных дробях
+
+
+
+%%% Изображения %%%
+\usepackage{graphicx}                               % Подключаем пакет работы с графикой
+\usepackage{wrapfig}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{trees}
+
+%%% Списки %%%
+\usepackage{enumitem}
+
+%%% Подписи %%%
+\usepackage{caption}                                % Для управления подписями (рисунков и таблиц) % Может управлять номерами рисунков и таблиц с caption %Иногда может управлять заголовками в списках рисунков и таблиц
+%% Использование:
+%\begin{table}[h!]\ContinuedFloat - чтобы не переключать счетчик
+%\captionsetup{labelformat=continued}% должен стоять до самого caption
+%\caption{}
+% либо ручками \caption*{Продолжение таблицы~\ref{...}.} :)
+
+%%% Интервалы %%%
+\addto\captionsrussian{%
+  \renewcommand{\listingname}{Листинг}%
+}
+%%% Счётчики %%%
+\usepackage[figure,table,section]{totalcount}               % Счётчик рисунков и таблиц
+\DeclareTotalCounter{lstlisting}
+\usepackage{totcount}                               % Пакет создания счётчиков на основе последнего номера подсчитываемого элемента (может требовать дважды компилировать документ)
+\usepackage{totpages}                               % Счётчик страниц, совместимый с hyperref (ссылается на номер последней страницы). Желательно ставить последним пакетом в преамбуле
+
+%%% Продвинутое управление групповыми ссылками (пока только формулами) %%%
+%% Кодировки и шрифты %%%
+
+%   \newfontfamily{\cyrillicfont}{Times New Roman}
+%   \newfontfamily{\cyrillicfonttt}{CMU Typewriter Text}
+	%\setmainfont{Times New Roman}
+	%\newfontfamily\cyrillicfont{Times New Roman}
+	%\setsansfont{Times New Roman}                    %% задаёт шрифт без засечек
+%	\setmonofont{Liberation Mono}               %% задаёт моноширинный шрифт
+%    \IfFileExists{pscyr.sty}{\renewcommand{\rmdefault}{ftm}}{}
+%%% Интервалы %%%
+%linespread-реализация ближе к реализации полуторного интервала в ворде.
+%setspace реализация заточена под шрифты 10, 11, 12pt, под остальные кегли хуже, но всё же ближе к типографской классике.
+\linespread{1.3}                    % Полуторный интервал (ГОСТ Р 7.0.11-2011, 5.3.6)
+%\renewcommand{\@biblabel}[1]{#1}
+
+%%% Гиперссылки %%%
+\usepackage{hyperref}
+
+%%% Выравнивание и переносы %%%
+\sloppy                             % Избавляемся от переполнений
+\clubpenalty=10000                  % Запрещаем разрыв страницы после первой строки абзаца
+\widowpenalty=10000                 % Запрещаем разрыв страницы после последней строки абзаца
+
+\makeatletter % малые заглавные, small caps shape
+\let\@@scshape=\scshape
+\renewcommand{\scshape}{%
+  \ifnum\strcmp{\f@series}{bx}=\z@
+    \usefont{T1}{cmr}{bx}{sc}%
+  \else
+    \ifnum\strcmp{\f@shape}{it}=\z@
+      \fontshape{scsl}\selectfont
+    \else
+      \@@scshape
+    \fi
+  \fi}
+\makeatother
+
+%%% Подписи %%%
+%\captionsetup{%
+%singlelinecheck=off,                % Многострочные подписи, например у таблиц
+%skip=2pt,                           % Вертикальная отбивка между подписью и содержимым рисунка или таблицы определяется ключом
+%justification=centering,            % Центрирование подписей, заданных командой \caption
+%}
+%%%        Подключение пакетов                 %%%
+\usepackage{ifthen}                 % добавляет ifthenelse
+%%% Инициализирование переменных, не трогать!  %%%
+\newcounter{intvl}
+\newcounter{otstup}
+\newcounter{contnumeq}
+\newcounter{contnumfig}
+\newcounter{contnumtab}
+\newcounter{pgnum}
+\newcounter{bibliosel}
+\newcounter{chapstyle}
+\newcounter{headingdelim}
+\newcounter{headingalign}
+\newcounter{headingsize}
+\newcounter{tabcap}
+\newcounter{tablaba}
+\newcounter{tabtita}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Область упрощённого управления оформлением %%%
+
+%% Интервал между заголовками и между заголовком и текстом
+% Заголовки отделяют от текста сверху и снизу тремя интервалами (ГОСТ Р 7.0.11-2011, 5.3.5)
+\setcounter{intvl}{3}               % Коэффициент кратности к размеру шрифта
+
+%% Отступы у заголовков в тексте
+\setcounter{otstup}{0}              % 0 --- без отступа; 1 --- абзацный отступ
+
+%% Нумерация формул, таблиц и рисунков
+\setcounter{contnumeq}{1}           % Нумерация формул: 0 --- пораздельно (во введении подряд, без номера раздела); 1 --- сквозная нумерация по всей диссертации
+\setcounter{contnumfig}{1}          % Нумерация рисунков: 0 --- пораздельно (во введении подряд, без номера раздела); 1 --- сквозная нумерация по всей диссертации
+\setcounter{contnumtab}{1}          % Нумерация таблиц: 0 --- пораздельно (во введении подряд, без номера раздела); 1 --- сквозная нумерация по всей диссертации
+
+%% Оглавление
+\setcounter{pgnum}{0}               % 0 --- номера страниц никак не обозначены; 1 --- Стр. над номерами страниц (дважды компилировать после изменения)
+
+%% Библиография
+\setcounter{bibliosel}{1}           % 0 --- встроенная реализация с загрузкой файла через движок bibtex8; 1 --- реализация пакетом biblatex через движок biber
+
+%% Текст и форматирование заголовков
+\setcounter{chapstyle}{1}           % 0 --- разделы только под номером; 1 --- разделы с названием "Глава" перед номером
+\setcounter{headingdelim}{1}        % 0 --- номер отделен пропуском в 1em или \quad; 1 --- номера разделов и приложений отделены точкой с пробелом, подразделы пропуском без точки; 2 --- номера разделов, подразделов и приложений отделены точкой с пробелом.
+
+%% Выравнивание заголовков в тексте
+\setcounter{headingalign}{0}        % 0 --- по центру; 1 --- по левому краю
+
+%% Размеры заголовков в тексте
+\setcounter{headingsize}{0}         % 0 --- по ГОСТ, все всегда 14 пт; 1 --- пропорционально изменяющийся размер в зависимости от базового шрифта
+
+%% Подпись таблиц
+\setcounter{tabcap}{0}              % 0 --- по ГОСТ, номер таблицы и название разделены тире, выровнены по левому краю, при необходимости на нескольких строках; 1 --- подпись таблицы не по ГОСТ, на двух и более строках, дальнейшие настройки:
+%Выравнивание первой строки, с подписью и номером
+\setcounter{tablaba}{2}             % 0 --- по левому краю; 1 --- по центру; 2 --- по правому краю
+%Выравнивание строк с самим названием таблицы
+\setcounter{tabtita}{1}             % 0 --- по левому краю; 1 --- по центру; 2 --- по правому краю
+
+%%% Рисунки %%%
+\DeclareCaptionLabelSeparator*{emdash}{~--- }             % (ГОСТ 2.105, 4.3.1)
+\captionsetup[figure]{labelsep=emdash,font=onehalfspacing,position=bottom}
+
+%%% Таблицы %%%
+\ifthenelse{\equal{\thetabcap}{0}}{%
+    \newcommand{\tabcapalign}{\raggedright}  % по левому краю страницы или аналога parbox
+}
+
+\ifthenelse{\equal{\thetablaba}{0} \AND \equal{\thetabcap}{1}}{%
+    \newcommand{\tabcapalign}{\raggedright}  % по левому краю страницы или аналога parbox
+}
+
+\ifthenelse{\equal{\thetablaba}{1} \AND \equal{\thetabcap}{1}}{%
+    \newcommand{\tabcapalign}{\centering}    % по центру страницы или аналога parbox
+}
+
+\ifthenelse{\equal{\thetablaba}{2} \AND \equal{\thetabcap}{1}}{%
+    \newcommand{\tabcapalign}{\raggedleft}   % по правому краю страницы или аналога parbox
+}
+
+\ifthenelse{\equal{\thetabtita}{0} \AND \equal{\thetabcap}{1}}{%
+    \newcommand{\tabtitalign}{\raggedright}  % по левому краю страницы или аналога parbox
+}
+
+\ifthenelse{\equal{\thetabtita}{1} \AND \equal{\thetabcap}{1}}{%
+    \newcommand{\tabtitalign}{\centering}    % по центру страницы или аналога parbox
+}
+
+\ifthenelse{\equal{\thetabtita}{2} \AND \equal{\thetabcap}{1}}{%
+    \newcommand{\tabtitalign}{\raggedleft}   % по правому краю страницы или аналога parbox
+}
+
+\DeclareCaptionFormat{tablenocaption}{\tabcapalign #1\strut}        % Наименование таблицы отсутствует
+\ifthenelse{\equal{\thetabcap}{0}}{%
+    \DeclareCaptionFormat{tablecaption}{\tabcapalign #1#2#3}
+    \captionsetup[table]{labelsep=emdash}                       % тире как разделитель идентификатора с номером от наименования
+}{%
+    \DeclareCaptionFormat{tablecaption}{\tabcapalign #1#2\par%  % Идентификатор таблицы на отдельной строке
+        \tabtitalign{#3}}                                       % Наименование таблицы строкой ниже
+    \captionsetup[table]{labelsep=space}                        % пробельный разделитель идентификатора с номером от наименования
+}
+\captionsetup[table]{format=tablecaption,singlelinecheck=off,font=onehalfspacing,position=top,skip=-5pt}  % многострочные наименования и прочее
+\DeclareCaptionLabelFormat{continued}{Продолжение таблицы~#2}
+\setlength{\belowcaptionskip}{.2cm}
+\setlength{\intextsep}{0ex}
+
+%%% Подписи подрисунков %%%
+\renewcommand{\thesubfigure}{\asbuk{subfigure}}           % Буквенные номера подрисунков
+\captionsetup[subfigure]{font={normalsize},               % Шрифт подписи названий подрисунков (не отличается от основного)
+    labelformat=brace,                                    % Формат обозначения подрисунка
+    justification=centering,                              % Выключка подписей (форматирование), один из вариантов
+}
+%\DeclareCaptionFont{font12pt}{\fontsize{12pt}{13pt}\selectfont} % объявляем шрифт 12pt для использования в подписях, тут же надо интерлиньяж объявлять, если не наследуется
+%\captionsetup[subfigure]{font={font12pt}}                 % Шрифт подписи названий подрисунков (всегда 12pt)
+
+%%% Настройки гиперссылок %%%
+
+\definecolor{linkcolor}{rgb}{0.0,0,0}
+\definecolor{citecolor}{rgb}{0,0.0,0}
+\definecolor{urlcolor}{rgb}{0,0,0}
+
+\hypersetup{
+    linktocpage=true,           % ссылки с номера страницы в оглавлении, списке таблиц и списке рисунков
+%    linktoc=all,                % both the section and page part are links
+%    pdfpagelabels=false,        % set PDF page labels (true|false)
+    plainpages=true,           % Forces page anchors to be named by the Arabic form  of the page number, rather than the formatted form
+    colorlinks,                 % ссылки отображаются раскрашенным текстом, а не раскрашенным прямоугольником, вокруг текста
+    linkcolor={linkcolor},      % цвет ссылок типа ref, eqref и подобных
+    citecolor={citecolor},      % цвет ссылок-цитат
+    urlcolor={urlcolor},        % цвет гиперссылок
+    pdflang={ru},
+}
+\urlstyle{same}
+%%% Шаблон %%%
+%\DeclareRobustCommand{\todo}{\textcolor{red}}       % решаем проблему превращения названия цвета в результате \MakeUppercase, http://tex.stackexchange.com/a/187930/79756 , \DeclareRobustCommand protects \todo from expanding inside \MakeUppercase
+\setlength{\parindent}{2.5em}                       % Абзацный отступ. Должен быть одинаковым по всему тексту и равен пяти знакам (ГОСТ Р 7.0.11-2011, 5.3.7).
+
+%%% Списки %%%
+% Используем дефис для ненумерованных списков (ГОСТ 2.105-95, 4.1.7)
+%\renewcommand{\labelitemi}{\normalfont\bfseries~{---}}
+\renewcommand{\labelitemi}{\bfseries~{---}}
+\setlist{nosep,%                                    % Единый стиль для всех списков (пакет enumitem), без дополнительных интервалов.
+    labelindent=\parindent,leftmargin=*%            % Каждый пункт, подпункт и перечисление записывают с абзацного отступа (ГОСТ 2.105-95, 4.1.8)
+}
+%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{xltxtra} % load xunicode
+
+\usepackage{ragged2e}
+\usepackage[explicit]{titlesec}
+\usepackage{placeins}
+\usepackage{xparse}
+\usepackage{csquotes}
+
+\usepackage{listingsutf8}
+\usepackage{url} %пакеты расширений
+\usepackage{algorithm, algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{blkarray}
+\usepackage{chngcntr}
+\usepackage{tabularx}
+\usepackage[backend=biber,
+    bibstyle=gost-numeric,
+    citestyle=nature]{biblatex}
+\newcommand*\template[1]{\text{<}#1\text{>}}
+\addbibresource{biblio.bib}
+
+\titleformat{name=\section,numberless}[block]{\normalfont\Large\centering}{}{0em}{#1}
+\titleformat{\section}[block]{\normalfont\Large\bfseries\raggedright}{}{0em}{\thesection\hspace{0.25em}#1}
+\titleformat{\subsection}[block]{\normalfont\Large\bfseries\raggedright}{}{0em}{\thesubsection\hspace{0.25em}#1}
+\titleformat{\subsubsection}[block]{\normalfont\large\bfseries\raggedright}{}{0em}{\thesubsubsection\hspace{0.25em}#1}
+
+\let\Algorithm\algorithm
+\renewcommand\algorithm[1][]{\Algorithm[#1]\setstretch{1.5}}
+%\renewcommand{\listingscaption}{Листинг}
+
+\usepackage{pifont}
+\usepackage{calc}
+\usepackage{suffix}
+\usepackage{csquotes}
+\DeclareQuoteStyle{russian}
+    {\guillemotleft}{\guillemotright}[0.025em]
+    {\quotedblbase}{\textquotedblleft}
+\ExecuteQuoteOptions{style=russian}
+\newcommand{\enq}[1]{\enquote{#1}}
+\newcommand{\eng}[1]{\begin{english}#1\end{english}}
+% Подчиненные счетчики в окружениях http://old.kpfu.ru/journals/izv_vuz/arch/sample1251.tex
+\newcounter{cTheorem}
+\newcounter{cDefinition}
+\newcounter{cConsequent}
+\newcounter{cExample}
+\newcounter{cLemma}
+\newcounter{cConjecture}
+\newtheorem{Theorem}{Теорема}[cTheorem]
+\newtheorem{Definition}{Определение}[cDefinition]
+\newtheorem{Consequent}{Следствие}[cConsequent]
+\newtheorem{Example}{Пример}[cExample]
+\newtheorem{Lemma}{Лемма}[cLemma]
+\newtheorem{Conjecture}{Гипотеза}[cConjecture]
+
+\renewcommand{\theTheorem}{\arabic{Theorem}}
+\renewcommand{\theDefinition}{\arabic{Definition}}
+\renewcommand{\theConsequent}{\arabic{Consequent}}
+\renewcommand{\theExample}{\arabic{Example}}
+\renewcommand{\theLemma}{\arabic{Lemma}}
+\renewcommand{\theConjecture}{\arabic{Conjecture}}
+%\makeatletter
+\NewDocumentCommand{\Newline}{}{\text{\\}}
+\newcommand{\sequence}[2]{\ensuremath \left(#1,\ \dots,\ #2\right)}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\renewcommand{\listalgorithmname}{Список алгоритмов}
+\floatname{algorithm}{Листинг}
+\renewcommand{\lstlistingname}{Листинг}
+\renewcommand{\thealgorithm}{\arabic{algorithm}}
+
+\newcommand{\refAlgo}[1]{(листинг~\ref{#1})}
+\newcommand{\refImage}[1]{(рисунок~\ref{#1})}
+
+\renewcommand{\theenumi}{\arabic{enumi}.}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\labelenumi}{\arabic{enumi}.}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\theenumii}{\arabic{enumii}}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\labelenumii}{(\arabic{enumii})}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\theenumiii}{\roman{enumiii}}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\labelenumiii}{(\roman{enumiii})}% Меняем везде перечисления на цифра.цифра
+%\newfontfamily\AnkaCoder[Path=src/fonts/]{AnkaCoder-r.ttf}
+\renewcommand{\labelitemi}{---}
+\renewcommand{\labelitemii}{---}
+
+%\usepackage{courier}
+
+\lstdefinelanguage{Refal}{
+  alsodigit = {.,<,>},
+  morekeywords = [1]{$ENTRY},
+  morekeywords = [2]{Go, Put, Get, Open, Close, Arg, Add, Sub, Mul, Div, Symb, Explode, Implode},
+  %keyword4
+  morekeywords = [3]{<,>},
+  %keyword5
+  morekeywords = [4]{e.,t.,s.},
+  sensitive = true,
+  morecomment = [l]{*},
+  morecomment = [s]{/*}{*/},
+  commentstyle = \color{mygreen},
+  morestring = [b]",
+  morestring = [b]',
+  stringstyle = \color{purple}
+}
+
+\makeatletter
+\def\p@subsection{}
+\def\p@subsubsection{\thesection\,\thesubsection\,}
+\makeatother
+\newcommand{\prog}[1]{{\ttfamily\small#1}}
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\ttfamily\footnotesize,
+  %basicstyle=\footnotesize\AnkaCoder,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks shoulbd only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=top,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  inputencoding=utf8,
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\bf,       % keyword style
+  language=Refal,                    % the language of the code
+  morekeywords={<,>,$ENTRY,Go,Arg, Open, Close, e., s., t., Get, Put},
+  							       % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  xleftmargin=25pt,
+  xrightmargin=25pt,
+  numberstyle=\small\color{black}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=8,                       % sets default tabsize to 8 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\newcommand{\anonsection}[1]{\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{section}{\protect\numberline{}#1}
+\section*{#1}\vspace*{2.5ex} % По госту положены 3 пустые строки после заголовка ненумеруемого раздела
+}
+\newcommand{\sectionbreak}{\clearpage}
+\renewcommand{\sectionfont}{\normalsize} % Сбиваем стиль оглавления в стандартный
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Точки в оглавлении напротив разделов
+
+\renewcommand{\cftsecfont}{\normalfont\large} % Переключение на times в содержании
+\renewcommand{\cftsubsecfont}{\normalfont\large} % Переключение на times в содержании
+
+\usepackage{caption}
+%\captionsetup[table]{justification=raggedleft}
+%\captionsetup[figure]{justification=centering,labelsep=endash}
+\usepackage{amsmath}    % \bar    (матрицы и проч. ...)
+\usepackage{amsfonts}   % \mathbb (символ для множества действительных чисел и проч. ...)
+\usepackage{mathtools}  % \abs, \norm
+    \DeclarePairedDelimiter\abs{\lvert}{\rvert} % операция модуля
+    \DeclarePairedDelimiter\norm{\lVert}{\rVert} % операция нормы
+\DeclareTextCommandDefault{\textvisiblespace}{%
+  \mbox{\kern.06em\vrule \@height.3ex}%
+  \vbox{\hrule \@width.3em}%
+  \hbox{\vrule \@height.3ex}}
+\newsavebox{\spacebox}
+\begin{lrbox}{\spacebox}
+\verb*! !
+\end{lrbox}
+\newcommand{\aspace}{\usebox{\spacebox}}
+\DeclareTotalCounter{listing}
+
+\makeatletter
+\renewcommand*{\p@subsubsection}{}
+\makeatother
+
+\makeatletter
+\AddToHook{begindocument/before}{\@ifpackageloaded{minted}{\removefromtoclist[float]{lol}}{}}
+\makeatother
+
+\begin{document}
+\sloppy
+
+\def\figurename{Рисунок}
+
+\begin{titlepage}
+	\thispagestyle{empty}
+	\newpage
+
+	\vspace*{-30pt}
+	\hspace{-45pt}
+	\begin{minipage}{0.17\textwidth}
+		\hspace*{-20pt}\centering
+		\includegraphics[width=1.3\textwidth]{emblem.png}
+	\end{minipage}
+	\begin{minipage}{0.82\textwidth}\small \textbf{
+			\vspace*{-0.7ex}
+			\hspace*{-10pt}\centerline{Министерство науки и высшего образования Российской Федерации}
+			\vspace*{-0.7ex}
+			\centerline{Федеральное государственное автономное образовательное учреждение }
+			\vspace*{-0.7ex}
+			\centerline{высшего образования}
+			\vspace*{-0.7ex}
+			\centerline{<<Московский государственный технический университет}
+			\vspace*{-0.7ex}
+			\centerline{имени Н.Э. Баумана}
+			\vspace*{-0.7ex}
+			\centerline{(национальный исследовательский университет)>>}
+			\vspace*{-0.7ex}
+			\centerline{(МГТУ им. Н.Э. Баумана)}}
+	\end{minipage}
+
+	\vspace{-2pt}
+	\hspace{-34.5pt}\rule{\textwidth}{2.5pt}
+
+	\vspace*{-20.3pt}
+	\hspace{-34.5pt}\rule{\textwidth}{0.4pt}
+
+	\vspace{0.5ex}
+	\noindent \small ФАКУЛЬТЕТ\hspace{80pt} <<Информатика и системы управления>>
+
+	\vspace*{-16pt}
+	\hspace{35pt}\rule{0.855\textwidth}{0.4pt}
+
+	\vspace{0.5ex}
+	\noindent \small КАФЕДРА\hspace{50pt} <<Теоретическая информатика и компьютерные технологии>>
+
+	\vspace*{-16pt}
+	\hspace{25pt}\rule{0.875\textwidth}{0.4pt}
+
+
+	\vspace{3em}
+
+	\begin{center}
+		\textbf{ОТЧЕТ} \\\textit{по лабораторной работе № 4\\по курсу <<Численные методы>>\\на тему: <<Метод Рунге-Кутта численного решения\\ задачи Коши системы ОДУ>>\\Вариант № 26} \\
+	\end{center}
+
+	\vspace{\fill}
+
+
+	\newlength{\ML}
+	\settowidth{\ML}{«\underline{\hspace{0.7cm}}» \underline{\hspace{2cm}}}
+
+	\noindent Студент \underline{\text{ИУ9-61Б}} \hfill \underline{ \hspace{4cm}}\quad
+	\raisebox{0.45ex}{\underline{\parbox{4cm}{\centering Старовойтов А.И.}}}
+
+	\vspace{-2.1ex}
+	\noindent\hspace{9ex}\scriptsize{(Группа)}\normalsize\hspace{170pt}\hspace{2ex}\scriptsize{(Подпись, дата)}\normalsize\hspace{30pt}\hspace{6ex}\scriptsize{(И.О. Фамилия)}\normalsize
+
+	\bigskip
+
+	\noindent Преподаватель  \hfill \underline{\hspace{4cm}}\quad
+	\raisebox{0.35ex}{\underline{\parbox{4cm}{\centering Домрачева А.Б.}}}
+
+	\vspace{-2ex}
+	\noindent\hspace{13.5ex}\normalsize\hspace{170pt}\hspace{2ex}\scriptsize{(Подпись, дата)}\normalsize\hspace{30pt}\hspace{6ex}\scriptsize{(И.О. Фамилия)}\normalsize
+
+	\bigskip
+
+	%\vspace{\fill}
+
+
+
+	\begin{center}
+		\textsl{2025 г.}
+	\end{center}
+\end{titlepage}
+
+%\renewcommand{\ttdefault}{pcr}
+
+\setlength{\tabcolsep}{3pt}
+\newpage
+\setcounter{page}{2}
+%----------------------------------------------------------------------------
+%                  ОТСЮДА --- СОБСТВЕННО ТЕКСТ
+%----------------------------------------------------------------------------
+
+\newpage
+\section{Цель}
+
+Реализация метода Рунге-Кутта численного решения задачи Коши для СОДУ.
+
+\section{Постановка задачи}
+
+Найти численно с погрешностью $\varepsilon$ = 0.001 решение задачи Коши для ДУ второго
+порядка, привести его к СОДУ первого порядка, используя метод Рунге-Кутта. Найти
+точное решение ДУ. Сравнить приближенное и точное решения на каждом шаге
+вычислений.
+
+Индивидуальный вариант: $y'' - 8y' + 7y = 14$, $y(0) = 1$, $y'(0) = 5$ на $[0, 1]$
+
+\section{Теоретический раздел}
+
+Метод Рунге-Кутта применяется для решения задачи Коши для системы ОДУ первого
+порядка.
+
+\[
+\begin{cases}
+y_1' = f_1(x, y_1, y_2, \ldots, y_n) \\
+y_2' = f_2(x, y_1, y_2, \ldots, y_n) \\
+\vdots \\
+y_n' = f_n(x, y_1, y_2, \ldots, y_n)
+\end{cases}
+\]
+
+на отрезке \([x_0, x_{\text{end}}]\) с начальными условиями:
+
+\[ y_1(x_0) = y_{01}, \ldots, y_n(x_0) = y_{0n} \]
+
+Сам метод заключается в последовательном нахождении вектор-коэффициентов
+\(k_1, k_2, k_3\) и \(k_4\) по формулам:
+
+\[
+\begin{aligned}
+k_1 &= f(x, y) \\
+k_2 &= f\left(x + \frac{h}{2}, y + \frac{hk_1}{2}\right) \\
+k_3 &= f\left(x + \frac{h}{2}, y + \frac{hk_2}{2}\right) \\
+k_4 &= f\left(x + \frac{h}{2}, y + \frac{hk_3}{2}\right)
+\end{aligned}
+\]
+
+и построении приближения к решению СОДУ в точке \(x + h\):
+
+\[ y(x + h) = y_h = y + \frac{h}{6}(k_1 + 2(k_2 + k_3) + k_4) \]
+
+\[ \text{err} = \frac{1}{2^p - 1}\|y_h - y_{2h}\| \]
+
+\section{Практический раздел}
+
+\captionof{listing}{Исходный код программы на Python}
+\vspace{0.5cm}
+  \begin{minted}[style=bw, breaklines, frame=single, fontsize = \footnotesize, linenos=false, xleftmargin = 1.5em]{python}
+#!/usr/bin/env python3
+
+# Вариант 26
+
+import math
+
+
+a, b = 0.0, 1.0
+eps = 0.001
+y0 = 1.0
+dy0 = 5.0
+n = 100
+h = (b-a) / n
+
+
+def dydx(x, y1, y2):
+    dy1 = y2
+    dy2 = 8 * y2 - 7 * y1 + 14
+    return dy1, dy2
+
+def runge_kutta_step(x, y1, y2, h):
+    k1y1, k1y2 = dydx(x, y1, y2)
+    k2y1, k2y2 = dydx(x + h/2, y1 + h/2 * k1y1, y2 + h/2 * k1y2)
+    k3y1, k3y2 = dydx(x + h/2, y1 + h/2 * k2y1, y2 + h/2 * k2y2)
+    k4y1, k4y2 = dydx(x + h, y1 + h * k3y1, y2 + h * k3y2)
+
+    next_y1 = y1 + h * (k1y1 + 2*k2y1 + 2*k3y1 + k4y1) / 6
+    next_y2 = y2 + h * (k1y2 + 2*k2y2 + 2*k3y2 + k4y2) / 6
+    return next_y1, next_y2
+
+def exact_solution(x):
+    C1 = 1
+    C2 = -2
+    return C1 * math.exp(7*x) + C2 * math.exp(x) + 2
+
+x_values = list()
+y_num = list()
+dy_num = list()
+y_exact = list()
+
+x = a
+y1 = y0
+y2 = dy0
+
+while x <= b:
+    x_values.append(x)
+    y_num.append(y1)
+    y_exact.append(exact_solution(x))
+    dy_num.append(y2)
+
+    y1, y2 = runge_kutta_step(x, y1, y2, h)
+    x += h
+
+print('|       x         |       y\'      |       y\'\'     |       y\'точное |       delta    |')
+for i in range(len(x_values)):
+    print('|{:14.7f}   |{:14.7f} |{:14.7f} |{:14.7f}  |{:14.7f}  |'.format(x_values[i], y_num[i], dy_num[i], y_exact[i], abs(y_exact[i] - y_num[i])))
+  \end{minted}
+
+\section{Тестирование}
+
+\captionof{listing}{Результаты работы программы}
+\vspace{0.5cm}
+  \begin{minted}[style=bw, breaklines, frame=single, fontsize = \tiny, linenos=false, xleftmargin = 1.5em]{md}
+|       x         |       y'      |       y''     |       y'точное |       delta    |
+|     0.0000000   |     1.0000000 |     5.0000000 |     1.0000000  |     0.0000000  |
+|     0.0100000   |     1.0524078 |     5.4874568 |     1.0524078  |     0.0000000  |
+|     0.0200000   |     1.1098711 |     6.0115137 |     1.1098711  |     0.0000000  |
+|     0.0300000   |     1.1727689 |     6.5748370 |     1.1727690  |     0.0000000  |
+|     0.0400000   |     1.2415082 |     7.1802866 |     1.2415083  |     0.0000001  |
+|     0.0500000   |     1.3165253 |     7.8309300 |     1.3165254  |     0.0000001  |
+|     0.0600000   |     1.3982883 |     8.5300570 |     1.3982885  |     0.0000001  |
+|     0.0700000   |     1.4872997 |     9.2811961 |     1.4872999  |     0.0000002  |
+|     0.0800000   |     1.5840982 |    10.0881321 |     1.5840984  |     0.0000002  |
+|     0.0900000   |     1.6892618 |    10.9549239 |     1.6892620  |     0.0000002  |
+|     0.1000000   |     1.8034106 |    11.8859253 |     1.8034109  |     0.0000003  |
+|     0.1100000   |     1.9272098 |    12.8858054 |     1.9272101  |     0.0000003  |
+|     0.1200000   |     2.0613729 |    13.9595726 |     2.0613733  |     0.0000004  |
+|     0.1300000   |     2.2066653 |    15.1125980 |     2.2066658  |     0.0000004  |
+|     0.1400000   |     2.3639082 |    16.3506426 |     2.3639086  |     0.0000005  |
+|     0.1500000   |     2.5339821 |    17.6798854 |     2.5339826  |     0.0000006  |
+|     0.1600000   |     2.7178318 |    19.1069531 |     2.7178325  |     0.0000006  |
+|     0.1700000   |     2.9164708 |    20.6389536 |     2.9164715  |     0.0000007  |
+|     0.1800000   |     3.1309859 |    22.2835098 |     3.1309868  |     0.0000008  |
+|     0.1900000   |     3.3625432 |    24.0487979 |     3.3625442  |     0.0000009  |
+|     0.2000000   |     3.6123934 |    25.9435868 |     3.6123945  |     0.0000011  |
+|     0.2100000   |     3.8818778 |    27.9772814 |     3.8818790  |     0.0000012  |
+|     0.2200000   |     4.1724355 |    30.1599689 |     4.1724368  |     0.0000014  |
+|     0.2300000   |     4.4856097 |    32.5024679 |     4.4856112  |     0.0000015  |
+|     0.2400000   |     4.8230560 |    35.0163816 |     4.8230577  |     0.0000017  |
+|     0.2500000   |     5.1865499 |    37.7141546 |     5.1865518  |     0.0000019  |
+|     0.2600000   |     5.5779962 |    40.6091341 |     5.5779983  |     0.0000021  |
+|     0.2700000   |     5.9994374 |    43.7156353 |     5.9994398  |     0.0000024  |
+|     0.2800000   |     6.4530648 |    47.0490114 |     6.4530674  |     0.0000026  |
+|     0.2900000   |     6.9412285 |    50.6257291 |     6.9412314  |     0.0000029  |
+|     0.3000000   |     7.4664491 |    54.4634491 |     7.4664523  |     0.0000032  |
+|     0.3100000   |     8.0314302 |    58.5811129 |     8.0314338  |     0.0000036  |
+|     0.3200000   |     8.6390718 |    62.9990357 |     8.6390758  |     0.0000040  |
+|     0.3300000   |     9.2924840 |    67.7390056 |     9.2924884  |     0.0000044  |
+|     0.3400000   |     9.9950028 |    72.8243909 |     9.9950077  |     0.0000049  |
+|     0.3500000   |    10.7502063 |    78.2802544 |    10.7502116  |     0.0000054  |
+|     0.3600000   |    11.5619319 |    84.1334764 |    11.5619378  |     0.0000059  |
+|     0.3700000   |    12.4342959 |    90.4128864 |    12.4343024  |     0.0000065  |
+|     0.3800000   |    13.3717127 |    97.1494043 |    13.3717199  |     0.0000072  |
+|     0.3900000   |    14.3789175 |   104.3761922 |    14.3789254  |     0.0000079  |
+|     0.4000000   |    15.4609887 |   112.1288172 |    15.4609974  |     0.0000087  |
+|     0.4100000   |    16.6233731 |   120.4454249 |    16.6233826  |     0.0000096  |
+|     0.4200000   |    17.8719127 |   129.3669276 |    17.8719232  |     0.0000105  |
+|     0.4300000   |    19.2128734 |   138.9372037 |    19.2128849  |     0.0000115  |
+|     0.4400000   |    20.6529753 |   149.2033138 |    20.6529880  |     0.0000126  |
+|     0.4500000   |    22.1994263 |   160.2157306 |    22.1994402  |     0.0000139  |
+|     0.4600000   |    23.8599570 |   172.0285868 |    23.8599722  |     0.0000152  |
+|     0.4700000   |    25.6428586 |   184.6999405 |    25.6428753  |     0.0000167  |
+|     0.4800000   |    27.5570238 |   198.2920595 |    27.5570421  |     0.0000183  |
+|     0.4900000   |    29.6119903 |   212.8717269 |    29.6120103  |     0.0000200  |
+|     0.5000000   |    31.8179875 |   228.5105680 |    31.8180094  |     0.0000219  |
+|     0.5100000   |    34.1859868 |   245.2854021 |    34.1860108  |     0.0000239  |
+|     0.5200000   |    36.7277553 |   263.2786186 |    36.7277814  |     0.0000262  |
+|     0.5300000   |    39.4559133 |   282.5785808 |    39.4559419  |     0.0000286  |
+|     0.5400000   |    42.3839967 |   303.2800596 |    42.3840280  |     0.0000313  |
+|     0.5500000   |    45.5265230 |   325.4846975 |    45.5265572  |     0.0000341  |
+|     0.5600000   |    48.8990625 |   349.3015074 |    48.8990998  |     0.0000373  |
+|     0.5700000   |    52.5183146 |   374.8474065 |    52.5183553  |     0.0000407  |
+|     0.5800000   |    56.4021898 |   402.2477897 |    56.4022342  |     0.0000444  |
+|     0.5900000   |    60.5698976 |   431.6371444 |    60.5699461  |     0.0000485  |
+|     0.6000000   |    65.0420406 |   463.1597096 |    65.0420934  |     0.0000529  |
+|     0.6100000   |    69.8407152 |   496.9701830 |    69.8407728  |     0.0000576  |
+|     0.6200000   |    74.9896204 |   533.2344794 |    74.9896833  |     0.0000628  |
+|     0.6300000   |    80.5141739 |   572.1305440 |    80.5142423  |     0.0000685  |
+|     0.6400000   |    86.4416363 |   613.8492247 |    86.4417109  |     0.0000746  |
+|     0.6500000   |    92.8012454 |   658.5952076 |    92.8013267  |     0.0000813  |
+|     0.6600000   |    99.6243590 |   706.5880207 |    99.6244475  |     0.0000885  |
+|     0.6700000   |   106.9446088 |   758.0631095 |   106.9447052  |     0.0000964  |
+|     0.6800000   |   114.7980655 |   813.2729916 |   114.7981704  |     0.0001049  |
+|     0.6900000   |   123.2234154 |   872.4884944 |   123.2235296  |     0.0001142  |
+|     0.7000000   |   132.2621501 |   936.0000829 |   132.2622743  |     0.0001242  |
+|     0.7100000   |   141.9587697 |  1004.1192833 |   141.9589049  |     0.0001351  |
+|     0.7200000   |   152.3610017 |  1077.1802101 |   152.3611486  |     0.0001470  |
+|     0.7300000   |   163.5200339 |  1155.5412043 |   163.5201937  |     0.0001598  |
+|     0.7400000   |   175.4907662 |  1239.5865898 |   175.4909400  |     0.0001737  |
+|     0.7500000   |   188.3320796 |  1329.7285573 |   188.3322684  |     0.0001888  |
+|     0.7600000   |   202.1071243 |  1426.4091848 |   202.1073296  |     0.0002052  |
+|     0.7700000   |   216.8836300 |  1530.1026053 |   216.8838530  |     0.0002230  |
+|     0.7800000   |   232.7342375 |  1641.3173300 |   232.7344798  |     0.0002423  |
+|     0.7900000   |   249.7368550 |  1760.5987420 |   249.7371182  |     0.0002632  |
+|     0.8000000   |   267.9750397 |  1888.5317692 |   267.9753256  |     0.0002858  |
+|     0.8100000   |   287.5384080 |  2025.7437519 |   287.5387184  |     0.0003104  |
+|     0.8200000   |   308.5230743 |  2172.9075180 |   308.5234113  |     0.0003370  |
+|     0.8300000   |   331.0321223 |  2330.7446812 |   331.0324882  |     0.0003659  |
+|     0.8400000   |   355.1761106 |  2500.0291781 |   355.1765078  |     0.0003971  |
+|     0.8500000   |   381.0736144 |  2681.5910628 |   381.0740454  |     0.0004310  |
+|     0.8600000   |   408.8518067 |  2876.3205750 |   408.8522743  |     0.0004677  |
+|     0.8700000   |   438.6470820 |  3085.1725044 |   438.6475894  |     0.0005074  |
+|     0.8800000   |   470.6057250 |  3309.1708711 |   470.6062754  |     0.0005505  |
+|     0.8900000   |   504.8846271 |  3549.4139455 |   504.8852242  |     0.0005971  |
+|     0.9000000   |   541.6520563 |  3807.0796316 |   541.6527039  |     0.0006476  |
+|     0.9100000   |   581.0884816 |  4083.4312414 |   581.0891838  |     0.0007023  |
+|     0.9200000   |   623.3874576 |  4379.8236878 |   623.3882190  |     0.0007614  |
+|     0.9300000   |   668.7565737 |  4697.7101260 |   668.7573992  |     0.0008255  |
+|     0.9400000   |   717.4184715 |  5038.6490775 |   717.4193664  |     0.0008949  |
+|     0.9500000   |   769.6119362 |  5404.3120693 |   769.6129062  |     0.0009700  |
+|     0.9600000   |   825.5930672 |  5796.4918283 |   825.5941185  |     0.0010513  |
+|     0.9700000   |   885.6365336 |  6217.1110690 |   885.6376729  |     0.0011393  |
+|     0.9800000   |   950.0369205 |  6668.2319186 |   950.0381550  |     0.0012345  |
+|     0.9900000   |  1019.1101732 |  7152.0660260 |  1019.1115107  |     0.0013375  |
+  \end{minted}
+
+\section{Вывод}
+
+В ходе выполнения лабораторной работы был реализован метод Рунге-Кутта для
+численного решения СОДУ. Реализация была выполнена в виде программы на языке
+Python и проведено сравнение приближенного и точного решения. Имея четвертый
+порядок точности, метод Рунге-Кутта прост в реализации.
+
+\end{document}
