@@ -3,7 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 
-A, B, C, D = 2, 3, -26, 4
+A, B, C, D = 1, -1, 0, -5
 
 
 def f(x):
@@ -11,14 +11,14 @@ def f(x):
 
 
 def f_der(x):
-    return 6 * x**2 + 6*x - 26
+    return 3 * x**2 + 2*x
 
 
 def f_der_der(x):
-    return 12*x + 6
+    return 6*x - 2
 
 
-intervals = [(-5, -4), (0, 1), (2, 3)]
+intervals = [(1, 3)]
 EPS = 0.001
 
 
@@ -40,8 +40,7 @@ def bisection_method(f, a, b):
 
 
 def newton_method(f, f_prime, x0):
-    iterations = 0
-    while iterations < 100:
+    for iterations in range(0, 100):
         fx = f(x0)
         fpx = f_prime(x0)
         x1 = x0 - fx / fpx
@@ -60,12 +59,12 @@ def main():
 
     print()
     print("Метод Ньютона:")
-    initial_guesses = [-4, 0, 3]
+    initial_guesses = [3]
     for guess in initial_guesses:
         root, iters = newton_method(f, f_der, guess)
         print(f"Начальное приближение {guess}: x = {root:.5f}, итераций = {iters}")
 
-    x_vals = np.linspace(-5, 5, 1000)
+    x_vals = np.linspace(-2, 3, 1000)
     matplotlib.use('TkAgg')
     plt.figure(figsize=(10, 6))
     plt.plot(x_vals, f(x_vals), label='f(x)')
