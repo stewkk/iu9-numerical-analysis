@@ -7,6 +7,7 @@ build:
 	@latexmk -f -pdf -output-directory=build -shell-escape ./report2.tex
 	@latexmk -f -pdf -output-directory=build -shell-escape ./report3.tex
 	@latexmk -f -pdf -output-directory=build -shell-escape ./report4.tex
+	@latexmk -f -pdf -output-directory=build -shell-escape ./report5.tex
 
 build-presentation:
 	@latexmk -f -pdf -output-directory=build -shell-escape ./presentation.tex

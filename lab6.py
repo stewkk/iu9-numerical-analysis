@@ -3,8 +3,8 @@
 # Вариант 25
 
 EPS = 0.001
-X0 = 0.0
-Y0 = 0.0
+X0 = -1.0
+Y0 = -1.0
 
 
 def f(x, y):
@@ -34,11 +34,12 @@ def d2fdxdy(x, y):
 def main():
     x = X0
     y = Y0
+    iterations = 0
     while True:
         df_dx = dfdx(x, y)
         df_dy = dfdy(x, y)
 
-        if max(df_dx, df_dy) <= EPS:
+        if max(abs(df_dx), abs(df_dy)) <= EPS:
             break
 
         sqr_df_dx = df_dx**2
@@ -52,17 +53,19 @@ def main():
 
         x -= t * df_dx
         y -= t * df_dy
+        iterations += 1
 
     f_min = f(x, y)
-    print(f"({x}, {y}) = {f_min}")
+    print(f"f({x}, {y}) = {f_min}")
     # min{x + 2 y + 4 (1 + x^2 + y^2)^0.5}≈3.316624790355399849114932737
     # at (x, y)≈(-0.3015113445777636226468120670, -0.6030226891555272452936241339)
     analytical = 3.316624790355399849114932737
     x_analytical = -0.3015113445777636226468120670
     y_analytical = -0.6030226891555272452936241339
-    print(f"analytical f({x_analytical, y_analytical}): {analytical}")
+    print(f"analytical f{x_analytical, y_analytical}: {analytical}")
     print(f"diff f(x, y): {abs(f_min - analytical):.10f}")
     print(f"diff: ({abs(x-x_analytical):.7f}, {y-y_analytical:.7f})" )
+    print("iterations:", iterations)
 
 
 if __name__ == "__main__":
