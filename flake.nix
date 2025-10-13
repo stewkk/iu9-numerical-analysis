@@ -1,41 +1,39 @@
 {
-  description = "ЧМЛА";
+  description = "An example project using flutter";
 
-  inputs = {
-    nixpkgs.url = "nixpkgs/nixos-25.05";
-    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+  inputs.nixpkgs = {
+    url = "github:NixOS/nixpkgs";
+  };
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.flake-compat = {
+    url = "github:edolstra/flake-compat";
+    flake = false;
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
+  outputs = { self, nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
-        system = "x86_64-linux";
-        pkgs-unstable = import nixpkgs-unstable {
-          inherit system;
-          config.allowUnfree = true;
-        };
         pkgs = import nixpkgs {
           inherit system;
+          config.allowUnfree = true;
+          config.android_sdk.accept_license = true;
         };
         pythonEnv = pkgs.python313.withPackages (ps: [
           ps.tkinter
           ps.pip
           ps.virtualenv
         ]);
-      in
-      {
-        devShells.default = pkgs.mkShell.override {stdenv = pkgs.llvmPackages_18.stdenv;} {
-          packages =
-            [
-              pkgs.julia-bin
-              pkgs.gnuplot
-              pkgs.tk
-              pkgs.tcl
-              pkgs-unstable.cursor-cli
-              pythonEnv
-            ];
+      in {
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            julia-bin
+            gnuplot
+            tk
+            tcl
+            code-cursor-fhs
+            pythonEnv
+          ];
+
           NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
             pkgs.stdenv.cc.cc
             pkgs.zlib
@@ -63,8 +61,7 @@
 
     python --version
   '';
-
         };
-      }
-    );
+      });
 }
+
