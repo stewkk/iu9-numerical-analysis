@@ -19,9 +19,9 @@
           config.android_sdk.accept_license = true;
         };
         pythonEnv = pkgs.python313.withPackages (ps: [
-          ps.tkinter
           ps.pip
           ps.virtualenv
+          ps.tkinter
         ]);
       in {
         devShells.default = pkgs.mkShell {
