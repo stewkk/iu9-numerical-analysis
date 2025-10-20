@@ -32,6 +32,7 @@
             tcl
             code-cursor-fhs
             pythonEnv
+            texlive.combined.scheme-full
           ];
 
           NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [

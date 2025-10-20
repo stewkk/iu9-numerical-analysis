@@ -166,6 +166,58 @@ end
 A = [1.0 2.0 3.0; 2.0 3.0 0.0; 0.0 0.0 6.0]
 @test danilevsky(A + A') == ([-0.9841, 7.9557, 13.0284], [[2.4788210675, -4.328033333333333, 1.0], [-2.757219792500001, -1.3481, 1.0], [0.19513387999999776, 0.34279999999999955, 1.0]])
 
+check_viet(A, eigenvalues) = begin
+    trace = tr(A)
+    sum_eigenvalues = sum(eigenvalues)
+    @test abs(trace - sum_eigenvalues) < 1e-3
+end
 
+check_gershgorin(A, eigenvalues) = begin
+    gershgorin_intervals = find_gershgorin_intervals(A)
+    for eigenvalue in eigenvalues
+        found = false
+        for interval in gershgorin_intervals
+            if eigenvalue >= interval[1] && eigenvalue <= interval[2]
+                found = true
+                break
+            end
+        end
+        @test found
+    end
+end
 
+check_orthogonality(eigenvalues, eigenvectors) = begin
+    orthogonal_count = 0
+    total_count = 0
 
+    for i in 1:lastindex(eigenvectors)-1
+        for j in (i+1):lastindex(eigenvectors)
+            if abs(eigenvalues[i] - eigenvalues[j]) > 0.01
+                dot_prod = abs(dot(eigenvectors[i], eigenvectors[j]))
+                total_count += 1
+                if dot_prod < 0.1
+                    orthogonal_count += 1
+                end
+            end
+        end
+    end
+
+    if total_count > 0
+        ratio = orthogonal_count / total_count
+        @test ratio > 0.5
+    end
+end
+
+main() = begin
+    A = [1.0 2.0 3.0; 2.0 4.0 5.0; 3.0 5.0 6.0]
+    values, vectors = danilevsky(A)
+    println(values)
+    println(vectors)
+
+    check_viet(A, values)
+    check_gershgorin(A, values)
+
+    check_orthogonality(values, vectors)
+end
+
+main()
